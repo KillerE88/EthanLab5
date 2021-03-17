@@ -1,44 +1,41 @@
-#include "Itemtype.h";
+#ifndef BITREE_H
+#define BITREE_H
+#include "ItemType.h"
+#include <cstdlib>
+#include <iostream>
+
+struct TreeNode
+{
+	ItemType iData;
+	TreeNode* pLeft;
+	TreeNode* pRight;
+};
+
 class BST
 {
 private:
-
-    struct node
-    {
-        int value;
-        node* left;
-        node* right;
-
-        node()
-        {
-            left = nullptr;
-            right = nullptr;
-        }
-
-        node(int val)
-        {
-            value = val;
-            left = nullptr;
-            right = nullptr;
-        }
-    };
-
-    node* findMin(node* N)
-    {
-        while (N->left != nullptr)
-            N = N->left;
-        return N;
-    }
+	TreeNode* pRoot;
+	//Helpers
+	void Insert(TreeNode*& pRoot, ItemType iNewItem);
+	void CreateNode(TreeNode*& pRoot, ItemType iNewItem);
+	void dPoint(TreeNode*& pRoot, ItemType iDeletedItem);
+	void Delete(TreeNode*& pRoot, ItemType iDeletedItem);
+	void inOrder(TreeNode* pRoot, ItemType& iDeletedItem);
+	void inOrderReading(TreeNode* pRoot);
+	void PrintGraph(TreeNode* pRoot, int nSpacingValue, int nLevelValue);
+	void rOrder(TreeNode* pRoot);
+	void Destroy(TreeNode* pRoot);
 
 public:
-
 	BST();
 	~BST();
-	void draw(node* N, int height, int actualHeight);
-	void drawTree(node* root);
-	void removeNode(node*& N, int value);
-	void getHeightOfTree(node* N, int& heightMax, int actualHeight);
-	bool addNode(node*& N, int value);
-	bool isInTree(node* N, int value);
-    void menu(node*& root);
+	void Add(ItemType iNewItem);
+	void Remove(ItemType iDeletedItem);
+	bool IsEmpty();
+	bool IsFull();
+	void Print();//Alphabet order
+	void TPrint(); //Tree
+	void RPrint();//Reverse order
 };
+
+#endif BITREE_H

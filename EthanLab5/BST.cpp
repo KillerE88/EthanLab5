@@ -1,153 +1,158 @@
 #include "BST.h"
-#include <iostream>
-
 using namespace std;
 
-void BST::draw(node* N, int height, int actualHeight)
+BST::BST()
 {
-    if (N != nullptr)
-    {
-        draw(N->right, height, actualHeight + 1);
-        cout << setw(actualHeight * 4) << N->value << endl;
-        draw(N->left, height, actualHeight + 1);
-    }
-    else if (actualHeight <= height)
-    {
-        for (size_t i = 0; i < height - actualHeight + 1; i++)
-        {
-            cout << endl;
-        }
-    }
+	pRoot = NULL;
 }
 
-void BST::drawTree(node* root)
+void BST::Add(ItemType iNewItem)
 {
-    int height = 0;
-    if (root != nullptr)
-    {
-        getHeightOfTree(root, height, 1);
-        draw(root, height, 1);
-    }
-    else
-        cout << "Tree is empty!" << endl;
+	if (IsFull() == false)
+		Insert(pRoot, iNewItem);
 }
 
-void BST::removeNode(node*& N, int value)
+//Helper function to BiTree::Add()
+void BST::Insert(TreeNode*& pRoot, ItemType iNewItem)
 {
-    if (N == nullptr)  //nothing to do, return
-        return;
-    if (value < N->value) //found value bigger than wanted, go left
-        removeNode(N->left, value);
-    else if (value > N->value)
-        removeNode(N->right, value); //found value smaller than wanted, go right
-    else //found the right value, delete
-    {
-        if (N->left == nullptr && N->right == nullptr) //no chlidren case
-        {
-            N = nullptr;
-        }
-        else if (N->left == nullptr) //right child case
-        {
-            N = N->right;
-        }
-        else if (N->right == nullptr) //left child case
-        {
-            N = N->left;
-        }
-        else  //both child case
-        {
-            node* temp = findMin(N->right);
-            N->value = temp->value;
-            removeNode(N->right, temp->value);
-        }
-    }
+	if (pRoot == NULL)
+		CreateNode(pRoot, iNewItem);
+	else if (iNewItem.ComparedTo(pRoot->iData) == LESS)
+		Insert(pRoot->pLeft, iNewItem);
+	else if (iNewItem.ComparedTo(pRoot->iData) == GREATER)
+		Insert(pRoot->pRight, iNewItem);
 }
 
-void BST::getHeightOfTree(node* N, int& heightMax, int actualHeight)
+//Helper function to 
+void BST::CreateNode(TreeNode*& pRoot, ItemType iNewItem)
 {
-    if (actualHeight > heightMax)
-        heightMax = actualHeight;
-    if (N->right != nullptr)
-        getHeightOfTree(N->right, heightMax, actualHeight + 1);
-    if (N->left != nullptr)
-        getHeightOfTree(N->left, heightMax, actualHeight + 1);
+	pRoot = new TreeNode;
+	pRoot->iData = iNewItem;
+	pRoot->pLeft = pRoot->pRight = NULL;
 }
 
-bool BST::addNode(node*& N, int value)
+void BST::Remove(ItemType iDeletedItem)
 {
-    static bool added = false; //returns don't work well with recurrence...
-    if (N == nullptr)
-    {
-        node* newNode = new node(value);
-        N = newNode;
-        added = true;
-    }
-    else if (isInTree(N, value) == false)
-    {
-        if (value >= N->value)
-            addNode(N->right, value);
-        else
-            addNode(N->left, value);
-    }
-    else
-        added = false;
-    return added;
+	if (IsEmpty() == false)
+		dPoint(pRoot, iDeletedItem);
 }
 
-bool BST::isInTree(node* N, int value)
+void BST::dPoint(TreeNode*& pRoot, ItemType iDeletedItem)
 {
-    while (N != nullptr)
-    {
-        if (N->value == value)
-            return true;
-        N = (N->value < value) ? N->right : N->left;
-    }
-    return false;
+	if (iDeletedItem.ComparedTo(pRoot->iData) == EQUAL)
+		Delete(pRoot, iDeletedItem);
+	else if (iDeletedItem.ComparedTo(pRoot->iData) == LESS)
+		Delete(pRoot->pLeft, iDeletedItem);
+	else if (iDeletedItem.ComparedTo(pRoot->iData) == GREATER)
+		Delete(pRoot->pRight, iDeletedItem);
 }
 
-void BST::menu(node*& root)
+void BST::Delete(TreeNode*& pRoot, ItemType iDeletedItem)
 {
-    int choice, value;
-    cout << "1> Add new node" << endl;
-    cout << "2> Remove a node" << endl;
-    cout << "3> Draw whole tree" << endl;
-    cout << "4> Show height" << endl;
-    cout << "0> Quit" << endl;
-    cout << "> ";
-    cin >> choice;
-    switch (choice)
-    {
-    case 0: // end app
-        delete root;
-        exit(0);
-        break;
-    case 1: // add element
-        cout << "Value of node to be added > ";
-        cin >> value;
-        if (addNode(root, value) == true)
-            cout << "Node has been added successfully!" << endl;
-        else
-            cout << "Such node already exists!" << endl;
-        break;
-    case 2: // remove element
-        cout << "Value of node to be deleted > ";
-        cin >> value;
-        if (isInTree(root, value) == true)
-        {
-            removeNode(root, value);
-            cout << "Node has been deleted successfully!" << endl;
-        }
-        else
-            cout << "Such node doesn't exist!" << endl;
-        break;
-    case 3: // draw tree
-        drawTree(root);
-        break;
-    case 4: // get height
-        int height = 0;
-        if (root != nullptr)
-            getHeightOfTree(root, height, 1);
-        cout << "Height: " << height << endl;
-        break;
-    }
+	TreeNode* pTemp = pRoot;
+
+	if (pRoot->pLeft == NULL)
+	{
+		pRoot = pRoot->pRight; 
+		delete pTemp;
+	}
+	else if (pRoot->pRight == NULL) {
+		pRoot = pRoot->pLeft;
+		delete pTemp;
+	}
+	else {
+		inOrder(pRoot->pLeft, iDeletedItem);
+		pRoot->iData = iDeletedItem;
+		dPoint(pRoot->pLeft, iDeletedItem);
+	}
+}
+
+void BST::inOrder(TreeNode* pRoot, ItemType& iDeleteItem)
+{
+	while (pRoot->pRight != NULL)
+		pRoot = pRoot->pRight;
+
+	iDeleteItem = pRoot->iData;
+}
+
+bool BST::IsEmpty()
+{
+	return (pRoot == NULL);
+}
+
+bool BST::IsFull()
+{
+	try
+	{
+		TreeNode* pTest = new TreeNode;
+		delete pTest;
+		return false;
+	}
+	catch (std::bad_alloc exception) {
+		return true;
+	}
+}
+
+void BST::Print()
+{
+	inOrderReading(pRoot);
+}
+
+//Helper function to BiTree::Print()
+void BST::inOrderReading(TreeNode* pRoot)
+{
+	if (pRoot != NULL)
+	{
+		inOrderReading(pRoot->pLeft);
+		cout << pRoot->iData.Get() << " ";
+		inOrderReading(pRoot->pRight);
+	}
+}
+
+void BST::TPrint()
+{
+	PrintGraph(pRoot, 0, 1);
+}
+
+void BST::PrintGraph(TreeNode* pRoot, int nSpacingValue, int nLevelValue)
+{
+	//Base case and end of recursive calls to PrintGraph()
+	if (pRoot == NULL)
+		return;
+	nSpacingValue += nLevelValue;
+	PrintGraph(pRoot->pRight, nSpacingValue, nLevelValue);
+
+	cout << std::endl;
+	for (int i = nLevelValue; i < nSpacingValue; i++)
+	cout << '\t';
+	cout << pRoot->iData.Get() << "\n";
+	PrintGraph(pRoot->pLeft, nSpacingValue, nLevelValue);
+}
+
+void BST::RPrint()
+{
+	rOrder(pRoot);
+}
+void BST::rOrder(TreeNode* pRoot)
+{
+	if (pRoot != NULL)
+	{
+		rOrder(pRoot->pRight);
+		cout << pRoot->iData.Get() << " ";
+		rOrder(pRoot->pLeft);
+	}
+}
+
+BST::~BST()
+{
+	Destroy(pRoot);
+}
+void BST::Destroy(TreeNode* pRoot)
+{
+	if (pRoot != NULL)
+	{
+		Destroy(pRoot->pLeft);
+		Destroy(pRoot->pRight);
+		delete pRoot;
+	}
 }

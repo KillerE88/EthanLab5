@@ -1,8 +1,7 @@
 #ifndef ITEMTYPE_H
 #define ITEMTYPE_H
-
-const int MAX_ITEMS = 100;
-typedef int type;
+#include <string>
+typedef std::string type;
 
 enum RelationType
 {
@@ -11,19 +10,14 @@ enum RelationType
 	EQUAL
 };
 
-class ItemType
-{
+class ItemType {
 public:
 	ItemType();
-	RelationType ComparedTo(ItemType item_);
-	void Set(type item_) { item = item_; };
+	RelationType ComparedTo(ItemType inputItem);
+	void Set(type inputItem) { item = inputItem; };
 	type Get() { return item; };
-	type getValue() { return item; };
-
 private:
 	type item;
 };
 
-
-
-#endif // !ITEMTYPE_H
+#endif ITEMTYPE_H

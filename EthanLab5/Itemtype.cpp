@@ -1,16 +1,18 @@
 #include "ItemType.h"
 
-ItemType::ItemType()
+ItemType::ItemType() 
 {
-	item = 0;
-}
+	item = " ";
+};
 
-RelationType ItemType::ComparedTo(ItemType item_)
+RelationType ItemType::ComparedTo(ItemType inputItem)
 {
-	if (item > item_.Get())
+	if (item > inputItem.Get()) {
 		return GREATER;
-	else if (item < item_.Get())
+	}
+	else if (item < inputItem.Get()) {
 		return LESS;
+	}
 	else
 		return EQUAL;
 }
